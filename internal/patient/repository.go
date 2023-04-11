@@ -11,7 +11,7 @@ type Repository interface {
 	GetPatientByID(id int) (domain.Patient, error)
 	GetPatientByDni(dni int) (domain.Patient, error)
 	DeletePatient(id int) error
-	UpdatePatient(p domain.Patient, id int) (domain.Patient, error)
+	UpdatePatient(id int, p domain.Patient)  (domain.Patient, error)
 }
 
 type repository struct {
@@ -22,38 +22,39 @@ func NewRepository(storage patient_store.StoreInterface) Repository {
 	return &repository{storage}
 }
 
-func (r *repository) GetPatientByID(id int) (domain.Patient, error) {
+func (repository *repository) GetPatientByID(id int) (domain.Patient, error) {
 	 
-	if !r.storage.ExistsPatient(id) {
+	if !repository.storage.ExistsPatient(id) {
 		return domain.Patient{}, errors.New("There is no patient with this Id")
 	}
 
-	product, err := r.storage.GetPatientById(id)
+	patient, err := repository.storage.GetPatientById(id)
 	if err != nil {
 		return domain.Patient{}, err
 	}
-	return product, nil
+	return patient, nil
 }
 
-func (r *repository) GetPatientByDni(dni int) (domain.Patient, error) {
+func (repository *repository) GetPatientByDni(dni int) (domain.Patient, error) {
 
-	product, err := r.storage.GetPatientByDni(dni)
+	patient, err := repository.storage.GetPatientByDni(dni)
 	if err != nil {
 		return domain.Patient{}, err
 	}
-	return product, nil
+	return patient, nil
 }
 
-func (r *repository) CreatePatient(p domain.Patient) (domain.Patient, error) {
+func (repository *repository) CreatePatient(p domain.Patient) (domain.Patient, error) {
 
-	_, err := r.storage.GetPatientByDni(p.DNI) 
+	_, err := repository.storage.GetPatientByDni(p.DNI) 
+
 	if err == nil {
-		return domain.Patient{}, errors.New("exist patient with this dni")
+		return domain.Patient{}, errors.New("Exist patient with this dni")
 	}
 
-	id, err := r.storage.CreatePatient(p)
+	id, err := repository.storage.CreatePatient(p)
 	if err != nil {
-		return domain.Patient{}, errors.New("error creating product")
+		return domain.Patient{}, errors.New("Error creating product")
 	} 
 
 	p.Id = int(id)
@@ -61,20 +62,34 @@ func (r *repository) CreatePatient(p domain.Patient) (domain.Patient, error) {
 	return p, nil
 }  
 
-func (r *repository) UpdatePatient(p domain.Patient, id int) (domain.Patient, error) {
+func (repository *repository) UpdatePatient(id int, p domain.Patient) (domain.Patient, error) {
 
-	if !r.storage.ExistsPatient(id) {
-		return domain.Patient{}, errors.New("code value already exists")
+	if !repository.storage.ExistsPatient(id) {
+		return domain.Patient{}, errors.New("There is no patient with this Id") 
 	}
 
-	err := r.storage.UpdatePatient(p, id)
+	pres, err := repository.storage.GetPatientByDni(p.DNI) 
+
+	if pres.Id != 0 && pres.Id != id {
+		return domain.Patient{}, errors.New("Exist dentist with this license")
+	}
+
+	err = repository.storage.UpdatePatient(p, id)
 	if err != nil {
-		return domain.Patient{}, errors.New("error updating product")
+		return domain.Patient{}, errors.New("Error updating product")
 	}
+
+	p.Id = id
+
 	return p, nil
 }
 
 func (r *repository) DeletePatient(id int) error {
+
+	if !r.storage.ExistsPatient(id) {
+		return errors.New("There is no patient with this Id")
+	}
+
 	err := r.storage.DeletePatient(id)
 	if err != nil {
 		return err

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"strconv"
+
 	"github.com/DamianSformo/proyecto-entregable-final/internal/dentist"
 	"github.com/DamianSformo/proyecto-entregable-final/internal/domain"
 	"github.com/DamianSformo/proyecto-entregable-final/pkg/web"
@@ -14,21 +15,21 @@ type dentistHandler struct {
 	service dentist.Service
 }
 
-func NewDentistHandler(s dentist.Service) *dentistHandler {
+func NewDentistHandler(service dentist.Service) *dentistHandler {
 	return &dentistHandler{
-		service: s,
+		service: service,
 	}
 }
 
-func (h *dentistHandler) GetDentistById() gin.HandlerFunc {
+func (handler *dentistHandler) GetDentistById() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idParam := c.Param("id")
 		id, err := strconv.Atoi(idParam)
 		if err != nil {
-			web.Failure(c, 400, errors.New("invalid format id"))
+			web.Failure(c, 400, errors.New("Invalid format id"))
 			return
 		}
-		dentist, err := h.service.GetDentistById(id)
+		dentist, err := handler.service.GetDentistById(id)
 		if err != nil {
 			web.Failure(c, 404, errors.New(err.Error()))
 			return
@@ -37,7 +38,7 @@ func (h *dentistHandler) GetDentistById() gin.HandlerFunc {
 	}
 }
 
-func (h *dentistHandler) PostDentist() gin.HandlerFunc {
+func (handler *dentistHandler) PostDentist() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		var dentist domain.Dentist
@@ -45,75 +46,48 @@ func (h *dentistHandler) PostDentist() gin.HandlerFunc {
 
 		token := c.GetHeader("TOKEN")
 		if token == "" {
-			web.Failure(c, 401, errors.New("token not found"))
+			web.Failure(c, 401, errors.New("Token not found"))
 			return
 		}
 		if token != os.Getenv("TOKEN") {
-			web.Failure(c, 401, errors.New("invalid token"))
+			web.Failure(c, 401, errors.New("Invalid token"))
 			return
 		}
 
-		valid, err := validateEmptys(&dentist)
+		valid, err := validateDentistEmpty(&dentist)
 		if !valid {
 			web.Failure(c, 400, err)
 			return
 		}
 
-		p, err := h.service.CreateDentist(dentist)
+		d, err := handler.service.CreateDentist(dentist)
 		if err != nil {
 			web.Failure(c, 400, err)
 			return
 		}
-		web.Success(c, 201, p)
+		web.Success(c, 201, d)
 	}
 }
 
-func (h *dentistHandler) DeleteDentist() gin.HandlerFunc {
+func (handler *dentistHandler) PutDentist() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("TOKEN")
 		if token == "" {
-			web.Failure(c, 401, errors.New("token not found"))
-			return
-		}
-		if token != os.Getenv("TOKEN") {
-			web.Failure(c, 401, errors.New("invalid token"))
-			return
-		}
-		idParam := c.Param("id")
-		id, err := strconv.Atoi(idParam)
-		if err != nil {
-			web.Failure(c, 400, errors.New("invalid id"))
-			return
-		}
-		
-		err = h.service.DeleteDentist(id)
-		if err != nil {
-			web.Failure(c, 404, err)
-			return
-		}
-		web.Success(c, 204, nil)
-	}
-}
-
-func (h *dentistHandler) Put() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		token := c.GetHeader("TOKEN")
-		if token == "" {
-			web.Failure(c, 401, errors.New("token not found"))
+			web.Failure(c, 401, errors.New("Token not found"))
 				return
 			}
 		if token != os.Getenv("TOKEN") {
-			web.Failure(c, 401, errors.New("invalid token"))
+			web.Failure(c, 401, errors.New("Invalid token"))
 			return
 		}
 		idParam := c.Param("id")
 		id, err := strconv.Atoi(idParam)
 		if err != nil {
-			web.Failure(c, 400, errors.New("invalid id"))
+			web.Failure(c, 400, errors.New("Invalid id"))
 			return
 		}
 
-		_, err = h.service.GetDentistById(id)
+		_, err = handler.service.GetDentistById(id)
 		if err != nil {
 			web.Failure(c, 404, errors.New(err.Error()))
 			return
@@ -124,29 +98,25 @@ func (h *dentistHandler) Put() gin.HandlerFunc {
 			return
 		}
 
-		var product domain.Dentist
-		err = c.ShouldBindJSON(&product)
-		if err != nil {
-			web.Failure(c, 400, errors.New("invalid json"))
-			return
-		}
+		var dentist domain.Dentist
+		err = c.ShouldBindJSON(&dentist)
 
-		valid, err := validateEmptys(&product)
+		valid, err := validateDentistEmpty(&dentist)
 		if !valid {
 			web.Failure(c, 400, err)
 			return
 		}
-
-		p, err := h.service.UpdateDentist(id, product)
+		
+		d, err := handler.service.UpdateDentist(id, dentist)
 		if err != nil {
 			web.Failure(c, 409, err)
 			return
 		}
-		web.Success(c, 200, p)
+		web.Success(c, 200, d)
 	}
 }
 
-func (h *dentistHandler) Patch() gin.HandlerFunc {
+func (h *dentistHandler) PatchDentist() gin.HandlerFunc {
 	type Request struct {
 		Name        string  `json:"name,omitempty"`
 		Surname    	string  `json:"surname,omitempty"`
@@ -155,11 +125,11 @@ func (h *dentistHandler) Patch() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("TOKEN")
 		if token == "" {
-			web.Failure(c, 401, errors.New("token not found"))
+			web.Failure(c, 401, errors.New("Token not found"))
 			return
 		}
 		if token != os.Getenv("TOKEN") {
-			web.Failure(c, 401, errors.New("invalid token"))
+			web.Failure(c, 401, errors.New("Invalid token"))
 			return
 		}
 		
@@ -167,15 +137,11 @@ func (h *dentistHandler) Patch() gin.HandlerFunc {
 		idParam := c.Param("id")
 		id, err := strconv.Atoi(idParam)
 		if err != nil {
-			web.Failure(c, 400, errors.New("invalid id"))
+			web.Failure(c, 400, errors.New("Invalid id"))
 			return
 		}
 
 		err = c.ShouldBindJSON(&r)
-		if err != nil {
-			web.Failure(c, 400, errors.New("invalid request body"))
-			return
-		}
 
 		dentist, err := h.service.GetDentistById(id)
 		if err != nil {
@@ -204,18 +170,37 @@ func (h *dentistHandler) Patch() gin.HandlerFunc {
 	}
 }
 
+func (handler *dentistHandler) DeleteDentist() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := c.GetHeader("TOKEN")
+		if token == "" {
+			web.Failure(c, 401, errors.New("Token not found"))
+			return
+		}
+		if token != os.Getenv("TOKEN") {
+			web.Failure(c, 401, errors.New("Invalid token"))
+			return
+		}
+		idParam := c.Param("id")
+		id, err := strconv.Atoi(idParam)
+		if err != nil {
+			web.Failure(c, 400, errors.New("Invalid id"))
+			return
+		}
+		
+		err = handler.service.DeleteDentist(id)
+		if err != nil {
+			web.Failure(c, 404, err)
+			return
+		}
+		web.Success(c, 204, nil)
+	}
+}
+
 func validateDentistEmpty(dentist *domain.Dentist) (bool, error) {
 	switch {
 	case dentist.Name == "" || dentist.Surname == "" || dentist.License == "" :
-		return false, errors.New("fields can't be empty")
-	}
-	return true, nil
-}
-
-func validateEmptys(product *domain.Dentist) (bool, error) {
-	switch {
-	case product.Name == "" || product.Surname == "" || product.License == "":
-		return false, errors.New("fields can't be empty")
+		return false, errors.New("Fields can't be empty")
 	}
 	return true, nil
 }

@@ -2,10 +2,8 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strconv"
-
 	"github.com/DamianSformo/proyecto-entregable-final/internal/domain"
 	"github.com/DamianSformo/proyecto-entregable-final/internal/patient"
 	"github.com/DamianSformo/proyecto-entregable-final/pkg/web"
@@ -16,15 +14,13 @@ type patientHandler struct {
 	service patient.Service
 }
 
-func NewPatientHandler(s patient.Service) *patientHandler {
+func NewPatientHandler(service patient.Service) *patientHandler {
 	return &patientHandler{
-		service : s,
+		service : service,
 	}
 }
 
-
-
-func (h *patientHandler) GetPatientByID() gin.HandlerFunc {
+func (handler *patientHandler) GetPatientByID() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idParam := c.Param("id")
 		id, err := strconv.Atoi(idParam)
@@ -32,18 +28,17 @@ func (h *patientHandler) GetPatientByID() gin.HandlerFunc {
 			web.Failure(c, 400, errors.New("Invalid format id"))
 			return
 		}
-		product, err := h.service.GetPatientByID(id)
+		patient, err := handler.service.GetPatientByID(id)
 		if err != nil {
 			web.Failure(c, 404, errors.New(err.Error()))
 			return
 		}
-		web.Success(c, 200, product)
+		web.Success(c, 200, patient)
 	}
 }
 
 
-
-func (h *patientHandler) GetPatientByDni() gin.HandlerFunc {
+func (handler *patientHandler) GetPatientByDni() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		dniParam := c.Param("dni")
 		dni, err := strconv.Atoi(dniParam)
@@ -51,17 +46,17 @@ func (h *patientHandler) GetPatientByDni() gin.HandlerFunc {
 			web.Failure(c, 400, errors.New("Invalid format dni"))
 			return
 		}
-		product, err := h.service.GetPatientByDni(dni)
+		patient, err := handler.service.GetPatientByDni(dni)
 		if err != nil {
 			web.Failure(c, 404, errors.New(err.Error()))
 			return
 		}
-		web.Success(c, 200, product)
+		web.Success(c, 200, patient)
 	}
 }
 
 
-func (h *patientHandler) PostPatient() gin.HandlerFunc {
+func (handler *patientHandler) PostPatient() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
@@ -69,19 +64,14 @@ func (h *patientHandler) PostPatient() gin.HandlerFunc {
 		c.BindJSON(&patient)
 
 		token := c.GetHeader("TOKEN")
-		//if token == "" {
-		//	web.Failure(c, 401, errors.New("token not found"))
-		//	return
-		//}
-		if token != os.Getenv("TOKEN") {
-			web.Failure(c, 401, errors.New("invalid token"))
+		if token == "" {
+			web.Failure(c, 401, errors.New("Token not found"))
 			return
 		}
-		
-		//if err != nil {
-		//	web.Failure(c, 400, errors.New("invalid json"))
-		//	return
-		//}
+		if token != os.Getenv("TOKEN") {
+			web.Failure(c, 401, errors.New("Invalid token"))
+			return
+		}
 
 		valid, err := validatePatientEmpty(&patient)
 		if !valid {
@@ -95,14 +85,12 @@ func (h *patientHandler) PostPatient() gin.HandlerFunc {
 			return
 		}
 
-		if patient.DNI < 1 {
+		if patient.DNI == 0 {
 			web.Failure(c, 400, errors.New("Invalid format dni"))
 			return
 		}
 
-		fmt.Println(patient)
-
-		p, err := h.service.CreatePatient(patient)
+		p, err := handler.service.CreatePatient(patient)
 		if err != nil {
 			web.Failure(c, 400, err)
 			return
@@ -112,26 +100,25 @@ func (h *patientHandler) PostPatient() gin.HandlerFunc {
 }
 
 
-
-func (h *patientHandler) PutPatient() gin.HandlerFunc {
+func (handler *patientHandler) PutPatient() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		//token := c.GetHeader("TOKEN")
-		//if token == "" {
-		//	web.Failure(c, 401, errors.New("token not found"))
-		//		return
-		//	}
-		//if token != os.Getenv("TOKEN") {
-		//	web.Failure(c, 401, errors.New("invalid token"))
-		//	return
-		//}
+		token := c.GetHeader("TOKEN")
+		if token == "" {
+			web.Failure(c, 401, errors.New("Token not found"))
+				return
+			}
+		if token != os.Getenv("TOKEN") {
+			web.Failure(c, 401, errors.New("Invalid token"))
+			return
+		}
 		idParam := c.Param("id")
 		id, err := strconv.Atoi(idParam)
 		if err != nil {
-			web.Failure(c, 400, errors.New("invalid id"))
+			web.Failure(c, 400, errors.New("Invalid id"))
 			return
 		}
 
-		_, err = h.service.GetPatientByID(id)
+		_, err = handler.service.GetPatientByID(id)
 		if err != nil {
 			web.Failure(c, 404, errors.New(err.Error()))
 			return
@@ -139,12 +126,6 @@ func (h *patientHandler) PutPatient() gin.HandlerFunc {
 
 		var patient domain.Patient
 		c.BindJSON(&patient)
-
-		//err = c.ShouldBindJSON(&patient)
-		//if err != nil {
-		//	web.Failure(c, 400, errors.New("invalid json"))
-		//	return
-		//}
 
 		valid, err := validatePatientEmpty(&patient)
 		if !valid {
@@ -158,7 +139,7 @@ func (h *patientHandler) PutPatient() gin.HandlerFunc {
 			return
 		}
 
-		p, err := h.service.UpdatePatient(patient, id)
+		p, err := handler.service.UpdatePatient(patient, id)
 		if err != nil {
 			web.Failure(c, 409, err)
 			return
@@ -167,25 +148,90 @@ func (h *patientHandler) PutPatient() gin.HandlerFunc {
 	}
 }
 
-func (h *patientHandler) DeletePatient() gin.HandlerFunc {
-	return func(c *gin.Context) {
 
-		//token := c.GetHeader("TOKEN")
-		//if token == "" {
-		//	web.Failure(c, 401, errors.New("token not found"))
-		//	return
-		//}
-		//if token != os.Getenv("TOKEN") {
-		//	web.Failure(c, 401, errors.New("invalid token"))
-		//	return
-		//}
+func (handler *patientHandler) Patch() gin.HandlerFunc {
+	type Request struct {
+		Name        string  `json:"name,omitempty"`
+		Surname		string	`json:"surname,omitempty"`
+		DNI 		int		`json:"dni,omitempty"`
+		Address     string	`json:"address,omitempty"`
+	}
+	return func(c *gin.Context) {
+		token := c.GetHeader("TOKEN")
+		if token == "" {
+			web.Failure(c, 401, errors.New("Token not found"))
+			return
+		}
+		if token != os.Getenv("TOKEN") {
+			web.Failure(c, 401, errors.New("Invalid token"))
+			return
+		}
+		
+		var r Request
 		idParam := c.Param("id")
 		id, err := strconv.Atoi(idParam)
 		if err != nil {
-			web.Failure(c, 400, errors.New("invalid id"))
+			web.Failure(c, 400, errors.New("Invalid id"))
 			return
 		}
-		err = h.service.DeletePatient(id)
+
+		err = c.ShouldBindJSON(&r)
+		if err != nil {
+			web.Failure(c, 400, errors.New("Invalid request body"))
+			return
+		}
+
+		patient, err := handler.service.GetPatientByID(id)
+		if err != nil {
+			web.Failure(c, 404, errors.New(err.Error()))
+			return
+		}
+		
+		if r.Name != ""{
+			patient.Name = r.Name
+		}
+
+		if r.Surname != ""{
+			patient.Surname = r.Surname
+		}
+
+		if r.DNI > 0{
+			patient.DNI = r.DNI
+		}
+
+		if r.Address != ""{
+			patient.Address = r.Address
+		}
+
+		p, err := handler.service.UpdatePatient(patient, id)
+		if err != nil {
+			web.Failure(c, 409, err)
+			return
+		}
+		web.Success(c, 200, p)
+	}
+}
+
+
+func (handler *patientHandler) DeletePatient() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		token := c.GetHeader("TOKEN")
+		if token == "" {
+			web.Failure(c, 401, errors.New("Token not found"))
+			return
+		}
+		if token != os.Getenv("TOKEN") {
+			web.Failure(c, 401, errors.New("Invalid token"))
+			return
+		}
+		idParam := c.Param("id")
+		id, err := strconv.Atoi(idParam)
+		if err != nil {
+			web.Failure(c, 400, errors.New("Invalid id"))
+			return
+		}
+		err = handler.service.DeletePatient(id)
 		if err != nil {
 			web.Failure(c, 404, err)
 			return
@@ -194,19 +240,19 @@ func (h *patientHandler) DeletePatient() gin.HandlerFunc {
 	}
 }
 
-// validateEmptys valida que los campos no esten vacios
+
 func validatePatientEmpty(patient *domain.Patient) (bool, error) {
 	switch {
-	case patient.Name == "" || patient.Surname == "" || patient.DNI < 0 || patient.Address == "" :
-		return false, errors.New("fields can't be empty")
+	case patient.Name == "" || patient.Surname == "" || patient.Address == "" :
+		return false, errors.New("Fields can't be empty")
 	}
 	return true, nil
 }
 
-// validatePatientDate valida que el campo feche no exista
+
 func validatePatientDate(patient *domain.Patient) (bool, error) {
 	if patient.Date != ""{
-		return false, errors.New("la fecha no se puede editar")
+		return false, errors.New("Date cannot be edited")
 	}
 	return true, nil
 }

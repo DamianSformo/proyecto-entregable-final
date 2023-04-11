@@ -18,13 +18,15 @@ func NewSqlStore(db * sql.DB) StoreInterface{
 
 func (s *sqlStore) GetDentistById(id int)(domain.Dentist, error){
 	var dentist domain.Dentist
-	query := "SELECT * FROM dentists WHERE id = ?;"
+	query := "SELECT * FROM dentists WHERE id = ?"
 	row := s.db.QueryRow(query, id)
 
 	err := row.Scan(&dentist.Id, &dentist.Name, &dentist.Surname, &dentist.License)
 	if err != nil{
 		return domain.Dentist{}, err
 	}
+
+	fmt.Println(dentist)
 
 	return dentist, nil
 }
@@ -41,14 +43,14 @@ func (s *sqlStore) GetDentistByLicense(license string)(domain.Dentist, error){
 	return dentist, nil
 }
 
-func (s * sqlStore)CreateDentist(product domain.Dentist) (int64, error){
-	query := "insert into dentists (name, surname, license) VALUES (?, ?, ?)"
+func (s * sqlStore)CreateDentist(dentist domain.Dentist) (int64, error){
+	query := "INSERT INTO dentists (name, surname, license) VALUES (?, ?, ?)"
 	stm, err := s.db.Prepare(query)
 	if err != nil{
 		return 0, err
 	}
 
-	res, err := stm.Exec(product.Name, product.Surname, product.License)
+	res, err := stm.Exec(dentist.Name, dentist.Surname, dentist.License)
 
 	if err != nil{
 		return 0, err
@@ -66,14 +68,14 @@ func (s * sqlStore)CreateDentist(product domain.Dentist) (int64, error){
 	return id, nil
 }
 
-func (s * sqlStore)Update(product domain.Dentist, id int) error{
+func (s * sqlStore)Update(dentist domain.Dentist, id int) error{
 	query := "UPDATE dentists SET name=?, surname=?, license=? WHERE id=?"
 	stm, err := s.db.Prepare(query)
 	if err != nil{
 		return err
 	}
 
-	res, err := stm.Exec(product.Name, product.Surname, product.License, id)
+	res, err := stm.Exec(dentist.Name, dentist.Surname, dentist.License, id)
 	if err != nil{
 		return err
 	}
@@ -81,7 +83,7 @@ func (s * sqlStore)Update(product domain.Dentist, id int) error{
 	if _, err := res.RowsAffected(); err != nil{
 		return err
 	}
-
+ 
 	return nil
 }
 

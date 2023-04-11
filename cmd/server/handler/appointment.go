@@ -14,13 +14,32 @@ type appointmentHandler struct {
 	service appointment.Service
 }
 
-func NewAppointmentHandler(s appointment.Service) *appointmentHandler {
+func NewAppointmentHandler(service appointment.Service) *appointmentHandler {
 	return &appointmentHandler{
-		service : s,
+		service : service,
 	}
 }
 
-func (h *appointmentHandler) GetAppointmentByDni() gin.HandlerFunc {
+
+func (handler *appointmentHandler) GetAppointmentById() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		idParam := c.Param("id")
+		id, err := strconv.Atoi(idParam)
+		if err != nil {
+			web.Failure(c, 400, errors.New("Invalid format id"))
+			return
+		}
+		appointment, err := handler.service.GetAppointmentById(id)
+		if err != nil {
+			web.Failure(c, 404, errors.New(err.Error()))
+			return
+		}
+		web.Success(c, 200, appointment)
+	}
+}
+
+
+func (handler *appointmentHandler) GetAppointmentByDni() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		dniParam := c.Param("dni")
 		dni, err := strconv.Atoi(dniParam)
@@ -28,66 +47,50 @@ func (h *appointmentHandler) GetAppointmentByDni() gin.HandlerFunc {
 			web.Failure(c, 400, errors.New("Invalid format dni"))
 			return
 		}
-		product, err := h.service.GetAppointmentByDni(dni)
+		appointment, err := handler.service.GetAppointmentByDni(dni)
 		if err != nil {
 			web.Failure(c, 404, errors.New(err.Error()))
 			return
 		}
-		web.Success(c, 200, product)
+		web.Success(c, 200, appointment)
 	}
 }
 
-func (h *appointmentHandler) PostAppointment() gin.HandlerFunc {
+
+func (handler *appointmentHandler) PostAppointment() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
-		//dniPatientParam := c.Param("dniPatient")
-		//dniPatient, err := strconv.Atoi(dniPatientParam)
-		//if err != nil {
-		//	web.Failure(c, 400, errors.New("Invalid format dni"))
-		//	return
-		//}
-
-		var appointment domain.Appointment
-		c.BindJSON(&appointment)
+		var a domain.Appointment
+		c.BindJSON(&a)
 
 		token := c.GetHeader("TOKEN")
-		//if token == "" {
-		//	web.Failure(c, 401, errors.New("token not found"))
-		//	return
-		//}
-		if token != os.Getenv("TOKEN") {
-			web.Failure(c, 401, errors.New("invalid token"))
+		if token == "" {
+			web.Failure(c, 401, errors.New("Token not found"))
 			return
 		}
-		
-		//if err != nil {
-		//	web.Failure(c, 400, errors.New("invalid json"))
-		//	return
-		//}
+		if token != os.Getenv("TOKEN") {
+			web.Failure(c, 401, errors.New("Invalid token"))
+			return
+		}
 
-		//valid, err := validatePatientEmpty(&appointment)
-		//if !valid {
-		//	web.Failure(c, 400, err)
-		//	return
-		//}
-//
-		//validDate, err := validatePatientDate(&appointment)
-		//if !validDate {
-		//	web.Failure(c, 400, err)
-		//	return
-		//}
+		valid, err := validateAppointmentEmpty(&a)
+		if !valid {
+			web.Failure(c, 400, err)
+			return
+		}
 
-		p, err := h.service.CreateAppointment(appointment)
+		appointment, err := handler.service.CreateAppointment(a)
 		if err != nil {
 			web.Failure(c, 400, err)
 			return
 		}
-		web.Success(c, 201, p)
+		web.Success(c, 201, appointment)
 	}
 }
 
-func (h *appointmentHandler) PostAppointmentByDniAndLicense() gin.HandlerFunc {
+
+func (handler *appointmentHandler) PostAppointmentByDniAndLicense() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
@@ -100,43 +103,61 @@ func (h *appointmentHandler) PostAppointmentByDniAndLicense() gin.HandlerFunc {
 
 		licenseDentist := c.Param("license")
 
-		//licenseDentist := c.Param("license")
-
-		var appointment domain.Appointment
-		c.BindJSON(&appointment)
+		var a domain.Appointment
+		c.BindJSON(&a)
 
 		token := c.GetHeader("TOKEN")
-		//if token == "" {
-		//	web.Failure(c, 401, errors.New("token not found"))
-		//	return
-		//}
-		if token != os.Getenv("TOKEN") {
-			web.Failure(c, 401, errors.New("invalid token"))
+		if token == "" {
+			web.Failure(c, 401, errors.New("Token not found"))
 			return
 		}
-		
-		//if err != nil {
-		//	web.Failure(c, 400, errors.New("invalid json"))
-		//	return
-		//}
+		if token != os.Getenv("TOKEN") {
+			web.Failure(c, 401, errors.New("Invalid token"))
+			return
+		}
 
-		//valid, err := validatePatientEmpty(&appointment)
-		//if !valid {
-		//	web.Failure(c, 400, err)
-		//	return
-		//}
-//
-		//validDate, err := validatePatientDate(&appointment)
-		//if !validDate {
-		//	web.Failure(c, 400, err)
-		//	return
-		//}
-
-		p, err := h.service.CreateAppointmentByDniAndLicense(appointment, dniPatient, licenseDentist)
+		appointment, err := handler.service.CreateAppointmentByDniAndLicense(a, dniPatient, licenseDentist)
 		if err != nil {
 			web.Failure(c, 400, err)
 			return
 		}
-		web.Success(c, 201, p)
+		web.Success(c, 201, appointment)
 	}
+}
+
+
+func (handler *appointmentHandler) DeleteAppointment() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		token := c.GetHeader("TOKEN")
+		if token == "" {
+			web.Failure(c, 401, errors.New("Token not found"))
+			return
+		}
+		if token != os.Getenv("TOKEN") {
+			web.Failure(c, 401, errors.New("Invalid token"))
+			return
+		}
+		idParam := c.Param("id")
+		id, err := strconv.Atoi(idParam)
+		if err != nil {
+			web.Failure(c, 400, errors.New("Invalid id"))
+			return
+		}
+		err = handler.service.DeleteAppointment(id)
+		if err != nil {
+			web.Failure(c, 404, err)
+			return
+		}
+		web.Success(c, 204, nil)
+	}
+}
+
+
+func validateAppointmentEmpty(appointment *domain.Appointment) (bool, error) {
+	switch {
+	case appointment.Date == "" || appointment.Dentist.Id == 0 || appointment.Patient.Id == 0 :
+		return false, errors.New("Fields can't be empty")
+	}
+	return true, nil
 }

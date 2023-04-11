@@ -15,21 +15,21 @@ type service struct {
 	repository Repository
 }
 
-func NewService(r Repository) Service {
-	return &service{r}
+func NewService(repository Repository) Service {
+	return &service{repository}
 }
 
-func (s *service) GetDentistById(id int) (domain.Dentist, error) {
-	p, err := s.repository.GetDentistById(id)
+func (service *service) GetDentistById(id int) (domain.Dentist, error) {
+	dentist, err := service.repository.GetDentistById(id)
 	if err != nil {
 		return domain.Dentist{}, err
 	}
-	return p, nil
+	return dentist, nil
 }
 
 
-func (s *service) CreateDentist(d domain.Dentist) (domain.Dentist, error) {
-	d, err := s.repository.CreateDentist(d)
+func (service *service) CreateDentist(d domain.Dentist) (domain.Dentist, error) {
+	d, err := service.repository.CreateDentist(d)
 	if err != nil {
 		return domain.Dentist{}, err
 	}
@@ -37,30 +37,33 @@ func (s *service) CreateDentist(d domain.Dentist) (domain.Dentist, error) {
 }
 
 
-func (s *service) UpdateDentist(id int, d domain.Dentist) (domain.Dentist, error) {
-	p, err := s.repository.GetDentistById(id)
+func (service *service) UpdateDentist(id int, d domain.Dentist) (domain.Dentist, error) {
+
+	dentist, err := service.repository.GetDentistById(id)
+
 	if err != nil {
 		return domain.Dentist{}, err
 	}
 	if d.Name != "" {
-		p.Name = d.Name
+		dentist.Name = d.Name
 	}
 	if d.Surname != "" {
-		p.Surname = d.Surname
+		dentist.Surname = d.Surname
 	}
 	if d.License != "" {
-		p.License = d.License 
+		dentist.License = d.License 
 	}
 	
-	p, err = s.repository.UpdateDentist(id, p)
+	dentist, err = service.repository.UpdateDentist(id, dentist)
 	if err != nil {
 		return domain.Dentist{}, err
 	}
-	return p, nil
+
+	return dentist, nil
 }
 
-func (s *service) DeleteDentist(id int) error {
-	err := s.repository.DeleteDentist(id)
+func (service *service) DeleteDentist(id int) error {
+	err := service.repository.DeleteDentist(id)
 	if err != nil {
 		return err
 	}

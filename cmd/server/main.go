@@ -21,7 +21,7 @@ func main() {
 
 	os.Setenv("TOKEN", "appointments")
 
-	db, err := sql.Open("mysql", "root:43824382@tcp(localhost:3306)/dbcharta")
+	db, err := sql.Open("mysql", "root:43824382@tcp(localhost:3306)/dbappointments")
 	if err != nil{
 		panic(err)
 	}
@@ -41,7 +41,7 @@ func main() {
 	appointmentStorage := appointment_store.NewSqlStore(db)
 	appointmentRepository := appointment.NewRepository(appointmentStorage)
 	appointmentService := appointment.NewService(appointmentRepository, patientRepository, dentistRepository)
-	appointmentProductHandler := handler.NewAppointmentHandler(appointmentService)
+	appointmentHandler := handler.NewAppointmentHandler(appointmentService)
 
 
 	r := gin.Default()
@@ -52,8 +52,8 @@ func main() {
 	{
 		dentists.GET(":id", dentistHandler.GetDentistById())
 		dentists.POST("", dentistHandler.PostDentist())
-		dentists.PATCH(":id", dentistHandler.Patch())
-		dentists.PUT(":id", dentistHandler.Put())
+		dentists.PATCH(":id", dentistHandler.PatchDentist())
+		dentists.PUT(":id", dentistHandler.PutDentist())
 		dentists.DELETE(":id", dentistHandler.DeleteDentist())
 	}
 
@@ -62,20 +62,20 @@ func main() {
 		patients.GET(":id", patientHandler.GetPatientByID())
 		patients.GET("/dni/:dni", patientHandler.GetPatientByDni())
 		patients.POST("", patientHandler.PostPatient())
-		//patients.PATCH(":id", patientProductHandler.Patch())
+		patients.PATCH(":id", patientHandler.Patch())
 		patients.PUT(":id", patientHandler.PutPatient())
 		patients.DELETE(":id", patientHandler.DeletePatient())
 	}
 
 	appointments := r.Group("/appointments")
 	{
-		//appointments.GET(":id", appointmentProductHandler.GetPatientByID())
-		appointments.GET("/dni/:dni", appointmentProductHandler.GetAppointmentByDni())
-		appointments.POST("", appointmentProductHandler.PostAppointment())
-		appointments.POST("dniAndLicense/:dni/:license", appointmentProductHandler.PostAppointmentByDniAndLicense())
-		//appointments.PATCH(":id", appointmentProductHandler.Patch())
-		//appointments.PUT(":id", appointmentProductHandler.PutPatient())
-		//appointments.DELETE(":id", appointmentProductHandler.DeletePatient())
+		appointments.GET(":id", appointmentHandler.GetAppointmentById())
+		appointments.GET("/dni/:dni", appointmentHandler.GetAppointmentByDni())
+		appointments.POST("", appointmentHandler.PostAppointment())
+		appointments.POST("dniAndLicense/:dni/:license", appointmentHandler.PostAppointmentByDniAndLicense())
+		//appointments.PATCH(":id", appointmentHandler.Patch())
+		//appointments.PUT(":id", appointmentHandler.PutPatient())
+		appointments.DELETE(":id", appointmentHandler.DeleteAppointment())
 	}
 
 	r.Run(":8080")

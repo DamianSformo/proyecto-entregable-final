@@ -21,27 +21,27 @@ func NewService(r Repository) Service {
 	return &service{r}
 }
 
-func (s *service) GetPatientByID(id int) (domain.Patient, error) {
-	p, err := s.repository.GetPatientByID(id) 
+func (service *service) GetPatientByID(id int) (domain.Patient, error) {
+	patient, err := service.repository.GetPatientByID(id) 
 	if err != nil {
 		return domain.Patient{}, err
 	}
-	return p, nil
+	return patient, nil
 }
 
-func (s *service) GetPatientByDni(dni int) (domain.Patient, error) {
-	p, err := s.repository.GetPatientByDni(dni) 
+func (service *service) GetPatientByDni(dni int) (domain.Patient, error) {
+	patient, err := service.repository.GetPatientByDni(dni) 
 	if err != nil {
 		return domain.Patient{}, err
 	}
-	return p, nil
+	return patient, nil
 }
 
-func (s *service) CreatePatient(p domain.Patient) (domain.Patient, error) {
+func (service *service) CreatePatient(p domain.Patient) (domain.Patient, error) {
 	t := time.Now()
 	p.Date = t.Format("2006-01-02")
 
-	p, err := s.repository.CreatePatient(p)
+	p, err := service.repository.CreatePatient(p)
 	if err != nil {
 		return domain.Patient{}, err
 	}
@@ -49,28 +49,28 @@ func (s *service) CreatePatient(p domain.Patient) (domain.Patient, error) {
 	return p, nil
 }
 
-func (s *service) UpdatePatient(p domain.Patient, id int) (domain.Patient, error) {
-	pat, err := s.repository.GetPatientByID(id)
+func (service *service) UpdatePatient(p domain.Patient, id int) (domain.Patient, error) {
+
+	patient, err := service.repository.GetPatientByID(id)
+
 	if err != nil {
 		return domain.Patient{}, err
 	}
 
-	if pat.Date != "" {
-		p.Date = pat.Date 
+	if patient.Date != "" {
+		p.Date = patient.Date 
 	}
 	
-	pat, err = s.repository.UpdatePatient(p, id)
+	patient, err = service.repository.UpdatePatient(id, p)
 	if err != nil {
 		return domain.Patient{}, err
 	}
-
-	pat.Id = id
 	
-	return pat, nil
+	return patient, nil
 }
 
-func (s *service) DeletePatient(id int) error  {
-	err := s.repository.DeletePatient(id)
+func (service *service) DeletePatient(id int) error  {
+	err := service.repository.DeletePatient(id)
 	if err != nil {
 		return err
 	}

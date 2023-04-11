@@ -7,9 +7,11 @@ import (
 )
 
 type Service interface {
+	GetAppointmentById(id int) (domain.Appointment, error)
 	GetAppointmentByDni(dni int) ([]domain.Appointment, error)
 	CreateAppointment(a domain.Appointment) (domain.Appointment, error)
 	CreateAppointmentByDniAndLicense(a domain.Appointment, dniPatient int, licenseDentist string) (domain.Appointment, error)
+	DeleteAppointment(id int) error
 }
 
 type service struct {
@@ -18,18 +20,18 @@ type service struct {
 	repositoryDentist dentist.Repository
 }
 
-func NewService(r Repository, rp patient.Repository, rd dentist.Repository) Service {
-	return &service{r, rp, rd}
+func NewService(repository Repository, repositoryPatient patient.Repository, repositoryDentist dentist.Repository) Service {
+	return &service{repository, repositoryPatient, repositoryDentist}
 }
 
-func (s *service) CreateAppointment(a domain.Appointment) (domain.Appointment, error) {
+func (service *service) CreateAppointment(a domain.Appointment) (domain.Appointment, error) {
 	
-	p, err := s.repositoryPatient.GetPatientByID(a.Patient.Id) 
+	p, err := service.repositoryPatient.GetPatientByID(a.Patient.Id) 
 	if err != nil {
 		return domain.Appointment{}, err
 	}
 
-	d, err := s.repositoryDentist.GetDentistById(a.Dentist.Id) 
+	d, err := service.repositoryDentist.GetDentistById(a.Dentist.Id) 
 	if err != nil {
 		return domain.Appointment{}, err
 	}
@@ -37,7 +39,7 @@ func (s *service) CreateAppointment(a domain.Appointment) (domain.Appointment, e
 	a.Patient = p
 	a.Dentist = d
 
-	a, err = s.repository.CreateAppointment(a)
+	a, err = service.repository.CreateAppointment(a)
 	if err != nil {
 		return domain.Appointment{}, err
 	}
@@ -45,14 +47,14 @@ func (s *service) CreateAppointment(a domain.Appointment) (domain.Appointment, e
 	return a, nil
 }
 
-func (s *service) CreateAppointmentByDniAndLicense(a domain.Appointment, dniPatient int, licenseDentist string) (domain.Appointment, error) {
+func (service *service) CreateAppointmentByDniAndLicense(a domain.Appointment, dniPatient int, licenseDentist string) (domain.Appointment, error) {
 	
-	p, err := s.repositoryPatient.GetPatientByDni(dniPatient) 
+	p, err := service.repositoryPatient.GetPatientByDni(dniPatient) 
 	if err != nil {
 		return domain.Appointment{}, err
 	}
 
-	d, err := s.repositoryDentist.GetDentistByLicense(licenseDentist) 
+	d, err := service.repositoryDentist.GetDentistByLicense(licenseDentist) 
 	if err != nil {
 		return domain.Appointment{}, err
 	}
@@ -60,7 +62,7 @@ func (s *service) CreateAppointmentByDniAndLicense(a domain.Appointment, dniPati
 	a.Patient = p
 	a.Dentist = d
 
-	a, err = s.repository.CreateAppointment(a)
+	a, err = service.repository.CreateAppointment(a)
 	if err != nil {
 		return domain.Appointment{}, err
 	}
@@ -68,20 +70,42 @@ func (s *service) CreateAppointmentByDniAndLicense(a domain.Appointment, dniPati
 	return a, nil
 }
 
-func (s *service) GetAppointmentByDni(dni int) ([]domain.Appointment, error) {
+func (service *service) GetAppointmentById(id int) (domain.Appointment, error) {
 
-	p, err := s.repositoryPatient.GetPatientByDni(dni) 
+	appointment, err := service.repository.GetAppointmentById(id)
+	if err != nil { 
+		return domain.Appointment{}, err
+	}
+
+	p, err := service.repositoryPatient.GetPatientByID(appointment.Patient.Id) 
+	if err != nil {
+		return domain.Appointment{}, err
+	}
+	d, err := service.repositoryDentist.GetDentistById(appointment.Dentist.Id) 
+	if err != nil {
+		return domain.Appointment{}, err
+	}
+
+	appointment.Patient = p
+	appointment.Dentist = d
+
+	return appointment, nil
+}
+
+func (service *service) GetAppointmentByDni(dni int) ([]domain.Appointment, error) {
+
+	p, err := service.repositoryPatient.GetPatientByDni(dni) 
 	if err != nil {
 		return nil, err
 	}
 
-	appointments, err := s.repository.GetAppointmentByDni(p.Id) 
+	appointments, err := service.repository.GetAppointmentByDni(p.Id) 
 	if err != nil {
 		return nil, err
 	}
 
 	for i := range appointments {
-		d, err := s.repositoryDentist.GetDentistById(appointments[i].Dentist.Id) 
+		d, err := service.repositoryDentist.GetDentistById(appointments[i].Dentist.Id) 
 		if err != nil {
 			return nil, err
 		}
@@ -91,3 +115,12 @@ func (s *service) GetAppointmentByDni(dni int) ([]domain.Appointment, error) {
 
 	return appointments, nil
 }
+
+func (service *service) DeleteAppointment(id int) error {
+	err := service.repository.DeleteAppointment(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+

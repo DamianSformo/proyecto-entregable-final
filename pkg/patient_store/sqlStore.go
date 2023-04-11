@@ -20,6 +20,7 @@ func (s *sqlStore) GetPatientById(id int)(domain.Patient, error){
 	var patient domain.Patient
 	query := "SELECT * FROM patients WHERE id = ?"
 	row := s.db.QueryRow(query, id)
+	
 	err := row.Scan(&patient.Id, &patient.Name, &patient.Surname, &patient.DNI, &patient.Address, &patient.Date)
 	if err != nil{
 		return domain.Patient{}, err
@@ -64,14 +65,14 @@ func (s *sqlStore)CreatePatient(patient domain.Patient) (int64, error){
 	return id, nil
 }
 
-func (s * sqlStore)UpdatePatient(product domain.Patient, id int) error{
+func (s * sqlStore)UpdatePatient(patient domain.Patient, id int) error{
 	query := "UPDATE patients SET name=?, surname=?, dni=?, address=?, date=? WHERE id=?"
 	stm, err := s.db.Prepare(query)
 	if err != nil{
 		return err
 	}
 
-	res, err := stm.Exec(product.Name, product.Surname, product.DNI, product.Address, product.Date, id)
+	res, err := stm.Exec(patient.Name, patient.Surname, patient.DNI, patient.Address, patient.Date, id)
 	if err != nil{
 		return err
 	}
@@ -83,21 +84,7 @@ func (s * sqlStore)UpdatePatient(product domain.Patient, id int) error{
 	return nil
 }
 
-func (s * sqlStore)ExistsPatient(id int) bool{
-	row := s.db.QueryRow("SELECT id FROM patients WHERE id = ?", id)
-	var i int
-	if err := row.Scan(&i); err != nil{
-		return false
-	}
-	if i > 0 {
-		return true
-	}
 
-	return false
-}
-
-
-// Delete elimina un producto
 func (s * sqlStore)DeletePatient(id int) error{
 	query := "DELETE FROM patients WHERE id = ?"
 
@@ -113,4 +100,18 @@ func (s * sqlStore)DeletePatient(id int) error{
 	fmt.Print(res)
 	
 	return nil
+}
+
+
+func (s * sqlStore)ExistsPatient(id int) bool{
+	row := s.db.QueryRow("SELECT id FROM patients WHERE id = ?", id)
+	var i int
+	if err := row.Scan(&i); err != nil{
+		return false
+	}
+	if i > 0 {
+		return true
+	}
+
+	return false
 }
