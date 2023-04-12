@@ -1,0 +1,539 @@
+{
+	"info": {
+		"_postman_id": "db0c92ca-0f06-4a1d-90e0-74d55ccc98bf",
+		"name": "appointment",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16752932"
+	},
+	"item": [
+		{
+			"name": "getDentistById",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/dentists/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"dentists",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "postDentist",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "TOKEN",
+						"value": "appointments",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Pedro\",\r\n    \"surname\": \"Ruiz\",\r\n    \"license\": \"BS33S24\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/dentists",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"dentists"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "putDentist",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "TOKEN",
+						"value": "appointments",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Pedro Luis\",\r\n    \"surname\": \"Ruiz García\",\r\n    \"license\": \"AC3342\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/dentists/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"dentists",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "patchDentist",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "TOKEN",
+						"value": "appointments",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"surname\": \"Lopez\",\r\n    \"license\": \"BS33S24\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/dentists/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"dentists",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteDentist",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "TOKEN",
+						"value": "appointments",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/dentists/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"dentists",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getPatientById",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/patients/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"patients",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getPatientByDni",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/patients/dni/12312344",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"patients",
+						"dni",
+						"12312344"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "postPatient",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "TOKEN",
+						"value": "appointments",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Juan\",\r\n    \"surname\": \"Romero\",\r\n    \"dni\": 12312344,\r\n    \"address\": \"Av. San Martín 1413\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/patients",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"patients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "putPatient",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "TOKEN",
+						"value": "appointments",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Luis\",\r\n    \"surname\": \"Romero\",\r\n    \"dni\": 12312344,\r\n    \"address\": \"Av. San Martín 1413, Mar del Plata\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/patients/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"patients",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "patchPatient",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "TOKEN",
+						"value": "appointments",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"address\": \"Mar del Plata, Buenos Aires\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/patients/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"patients",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deletePatient",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "TOKEN",
+						"value": "appointments",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/patients/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"patients",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAppointmentById",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/appointments/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"appointments",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAppointmentsByDniPatient",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/appointments/dni/12312344",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"appointments",
+						"dni",
+						"12312344"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "postAppointment",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "TOKEN",
+						"value": "appointments",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"date\": \"16-04-2023\",\r\n    \"patient\": {\"id\": 1},\r\n    \"dentist\": {\"id\": 1},\r\n    \"description\": \"Sobreturno\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/appointments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"appointments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "postAppointmentByDniAndLicense",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "TOKEN",
+						"value": "appointments",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"date\": \"18-05-2023\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/appointments/dniAndLicense/12312344/BS33S24",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"appointments",
+						"dniAndLicense",
+						"12312344",
+						"BS33S24"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "putAppointment",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "TOKEN",
+						"value": "appointments",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"date\": \"18-04-2023\",\r\n    \"patient\": {\"id\": 1},\r\n    \"dentist\": {\"id\": 1},\r\n    \"description\": \"Sobreturno - Tarde\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/appointments/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"appointments",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "patchAppointment",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "TOKEN",
+						"value": "appointments",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"dentist\": {\"id\": 2},\r\n    \"description\": \"Cambio de Dentista\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/appointments/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"appointments",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteAppointment",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "TOKEN",
+						"value": "appointments",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/appointments/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"appointments",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
