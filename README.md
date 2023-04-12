@@ -1,5 +1,7 @@
 ## TPII Go
 
+Podés accerder al proyecto también desde Github: https://github.com/DamianSformo/proyecto-entregable-final
+
 Para empezar la ejecucion de la aplicación, primero ejecutamos el script que se encuentra en esta misma carpeta para crear las tablas en la respectiva base de datos. Luego en el archivo main.go completamos los siguientes campos que hacen referencia a la base de datos a utilizar:
 
 	userdb
