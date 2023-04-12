@@ -9,8 +9,9 @@ type Service interface {
 	GetPatientByID(id int) (domain.Patient, error)
 	GetPatientByDni(dni int) (domain.Patient, error)
 	CreatePatient(p domain.Patient) (domain.Patient, error) 
-	DeletePatient(id int) error
 	UpdatePatient(p domain.Patient, id int) (domain.Patient, error)
+	DeletePatient(id int) error
+
 }
 
 type service struct {

@@ -21,7 +21,11 @@ func main() {
 
 	os.Setenv("TOKEN", "appointments")
 
-	db, err := sql.Open("mysql", "root:43824382@tcp(localhost:3306)/dbappointments")
+	var userdb = "root"
+	var passworddb = ""
+	var portdb = "3306"
+
+	db, err := sql.Open("mysql", userdb +":" + passworddb + "@tcp(localhost:" + portdb + ")/dbappointments")
 	if err != nil{
 		panic(err)
 	}
@@ -62,7 +66,7 @@ func main() {
 		patients.GET(":id", patientHandler.GetPatientByID())
 		patients.GET("/dni/:dni", patientHandler.GetPatientByDni())
 		patients.POST("", patientHandler.PostPatient())
-		patients.PATCH(":id", patientHandler.Patch())
+		patients.PATCH(":id", patientHandler.PatchPatient())
 		patients.PUT(":id", patientHandler.PutPatient())
 		patients.DELETE(":id", patientHandler.DeletePatient())
 	}
@@ -73,8 +77,8 @@ func main() {
 		appointments.GET("/dni/:dni", appointmentHandler.GetAppointmentByDni())
 		appointments.POST("", appointmentHandler.PostAppointment())
 		appointments.POST("dniAndLicense/:dni/:license", appointmentHandler.PostAppointmentByDniAndLicense())
-		//appointments.PATCH(":id", appointmentHandler.Patch())
-		//appointments.PUT(":id", appointmentHandler.PutPatient())
+		appointments.PUT(":id", appointmentHandler.PutAppointment())
+		appointments.PATCH(":id", appointmentHandler.PatchAppointment())
 		appointments.DELETE(":id", appointmentHandler.DeleteAppointment())
 	}
 

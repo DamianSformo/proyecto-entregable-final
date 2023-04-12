@@ -149,7 +149,7 @@ func (handler *patientHandler) PutPatient() gin.HandlerFunc {
 }
 
 
-func (handler *patientHandler) Patch() gin.HandlerFunc {
+func (handler *patientHandler) PatchPatient() gin.HandlerFunc {
 	type Request struct {
 		Name        string  `json:"name,omitempty"`
 		Surname		string	`json:"surname,omitempty"`

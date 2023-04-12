@@ -10,7 +10,8 @@ type Repository interface {
 	GetAppointmentById(id int) (domain.Appointment, error)
 	CreateAppointment(p domain.Appointment) (domain.Appointment, error)
 	GetAppointmentByDni(dni int) ([]domain.Appointment, error)
-	DeleteAppointment(id int) error
+	UpdateAppointment(a domain.Appointment, id int)  (domain.Appointment, error)
+	DeleteAppointment(id int) error 
 }
 
 type repository struct {
@@ -54,6 +55,22 @@ func (repository *repository) CreateAppointment(a domain.Appointment) (domain.Ap
 
 	return a, nil
 } 
+
+func (repository *repository) UpdateAppointment(a domain.Appointment, id int) (domain.Appointment, error) {
+
+	if !repository.storage.ExistsAppointment(id) {
+		return domain.Appointment{}, errors.New("There is no appointment with this Id") 
+	}
+
+	err := repository.storage.UpdateAppointment(a, id)
+	if err != nil {
+		return domain.Appointment{}, errors.New("Error updating appointment")
+	}
+
+	a.Id = id
+
+	return a, nil
+}
 
 func (repository *repository) DeleteAppointment(id int) error {
 	

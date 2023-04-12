@@ -10,8 +10,8 @@ type Repository interface {
 	CreatePatient(p domain.Patient) (domain.Patient, error)
 	GetPatientByID(id int) (domain.Patient, error)
 	GetPatientByDni(dni int) (domain.Patient, error)
-	DeletePatient(id int) error
 	UpdatePatient(id int, p domain.Patient)  (domain.Patient, error)
+	DeletePatient(id int) error
 }
 
 type repository struct {
@@ -54,7 +54,7 @@ func (repository *repository) CreatePatient(p domain.Patient) (domain.Patient, e
 
 	id, err := repository.storage.CreatePatient(p)
 	if err != nil {
-		return domain.Patient{}, errors.New("Error creating product")
+		return domain.Patient{}, errors.New("Error creating patient")
 	} 
 
 	p.Id = int(id)
@@ -76,7 +76,7 @@ func (repository *repository) UpdatePatient(id int, p domain.Patient) (domain.Pa
 
 	err = repository.storage.UpdatePatient(p, id)
 	if err != nil {
-		return domain.Patient{}, errors.New("Error updating product")
+		return domain.Patient{}, errors.New("Error updating patient")
 	}
 
 	p.Id = id

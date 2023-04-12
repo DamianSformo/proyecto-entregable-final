@@ -56,7 +56,7 @@ func (repository *repository) CreateDentist(d domain.Dentist) (domain.Dentist, e
 	
 	id, err := repository.storage.CreateDentist(d)
 	if err != nil {
-		return domain.Dentist{}, errors.New("Error creating product")
+		return domain.Dentist{}, errors.New("Error creating dentist")
 	}
 
 	d.Id = int(id) 
@@ -78,7 +78,7 @@ func (repository *repository) UpdateDentist(id int, d domain.Dentist) (domain.De
 
 	err = repository.storage.Update(d, id)
 	if err != nil {
-		return domain.Dentist{}, errors.New("Error updating product")
+		return domain.Dentist{}, errors.New("Error updating dentist")
 	}
 	return d, nil
 }

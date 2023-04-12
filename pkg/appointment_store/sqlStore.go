@@ -81,6 +81,25 @@ func (s *sqlStore)CreateAppointment(appointment domain.Appointment) (int64, erro
 	return id, nil
 }
 
+func (s * sqlStore)UpdateAppointment(appointment domain.Appointment, id int) error{
+	query := "UPDATE appointments SET patient=?, dentist=?, date=?, description=? WHERE id=?"
+	stm, err := s.db.Prepare(query)
+	if err != nil{
+		return err
+	}
+
+	res, err := stm.Exec(appointment.Patient.Id, appointment.Dentist.Id, appointment.Date, appointment.Description, id)
+	if err != nil{
+		return err
+	}
+
+	if _, err := res.RowsAffected(); err != nil{
+		return err
+	}
+
+	return nil
+}
+
 
 func (s * sqlStore)DeleteAppointment(id int) error{
 	query := "DELETE FROM appointments WHERE id = ?"

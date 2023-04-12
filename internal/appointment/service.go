@@ -11,6 +11,7 @@ type Service interface {
 	GetAppointmentByDni(dni int) ([]domain.Appointment, error)
 	CreateAppointment(a domain.Appointment) (domain.Appointment, error)
 	CreateAppointmentByDniAndLicense(a domain.Appointment, dniPatient int, licenseDentist string) (domain.Appointment, error)
+	UpdateAppointment(a domain.Appointment, id int) (domain.Appointment, error)
 	DeleteAppointment(id int) error
 }
 
@@ -68,6 +69,34 @@ func (service *service) CreateAppointmentByDniAndLicense(a domain.Appointment, d
 	}
 
 	return a, nil
+}
+
+func (service *service) UpdateAppointment(a domain.Appointment, id int) (domain.Appointment, error) {
+
+	appointment, err := service.repository.GetAppointmentById(id)
+	if err != nil {
+		return domain.Appointment{}, err
+	}
+
+	p, err := service.repositoryPatient.GetPatientByID(a.Patient.Id) 
+	if err != nil {
+		return domain.Appointment{}, err
+	}
+
+	d, err := service.repositoryDentist.GetDentistById(a.Dentist.Id) 
+	if err != nil {
+		return domain.Appointment{}, err
+	}
+
+	a.Patient = p
+	a.Dentist = d
+
+	appointment, err = service.repository.UpdateAppointment(a, id)
+	if err != nil {
+		return domain.Appointment{}, err
+	}
+	
+	return appointment, nil
 }
 
 func (service *service) GetAppointmentById(id int) (domain.Appointment, error) {
